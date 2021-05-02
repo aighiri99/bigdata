@@ -24,11 +24,14 @@ def main():
 
     df = load_data()
     year = st.sidebar.slider('Year', min_value=min(df['year'].astype('int').unique().tolist()), max_value=max(df['year'].astype('int').unique().tolist()))
-    x = df[(df['year'].astype('int') == year)]['GNI_per_capita'].values
-    y = df[(df['year'].astype('int') == year)]['Life_Expectancy'].values
-    sizes = df[(df['year'].astype('int') == year)]['Population'].values
-    colors = df[(df['year'].astype('int') == year)]['country'].values
-    g = sns.scatterplot(x=x, y=y, size = sizes, hue=colors)
+    countries = st.sidebar.multiselect("Countries", df['country'].unique())
+    df2 = df.loc[lambda d: d['country'].isin(countries)]
+    df2 = df2[df2['year'].astype('int') == year]
+    x = df2[(df2['year'].astype('int') == year)]['GNI_per_capita'].values
+    y = df2[(df2['year'].astype('int') == year)]['Life_Expectancy'].values
+    sizes = df2[(df2['year'].astype('int') == year)]['Population'].values
+    colors = df2[(df2['year'].astype('int') == year)]['country'].values.tolist()
+    g = sns.scatterplot(x='GNI_per_capita', y='Life_Expectancy', size = 'Population', hue=colors, data = df2, legend="full")
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     g.set(xlim=(0, 100000))
     st.pyplot(plt)
